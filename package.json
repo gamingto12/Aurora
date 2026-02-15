@@ -1,0 +1,21 @@
+{
+  "name": "discord-bot-starter",
+  "version": "1.0.0",
+  "description": "A beginner-friendly Discord bot starter template",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "node bot.js"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.14.0",
+    "dotenv": "^16.3.1"
+  }
+}
