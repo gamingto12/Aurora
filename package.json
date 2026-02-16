@@ -1,7 +1,7 @@
 {
-  "name": "discord-bot-starter",
+  "name": "discord-bot-aurora",
   "version": "1.0.0",
-  "description": "A beginner-friendly Discord bot starter template",
+  "description": "A feature-rich Discord bot built with discord.js, offering moderation, fun, and utility commands.",
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js",
