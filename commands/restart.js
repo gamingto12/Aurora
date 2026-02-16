@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const { DEFAULT_COLOR, ERROR_COLOR, FOOTER } = require('../utils/theme');
+const { spawn } = require('child_process');
 
 module.exports = {
   name: 'restart',
@@ -22,12 +23,20 @@ module.exports = {
       // Give Discord a moment to process the message, then restart
       setTimeout(async () => {
         console.log('Restarting bot...');
+        
+        // Spawn a new bot process before exiting
+        spawn('node', ['bot.js'], {
+          detached: true,
+          stdio: 'inherit'
+        }).unref();
+        
+        // Disconnect and exit the current process
         await client.destroy();
-        process.exit(0); // Exit with code 0 signals PM2 to restart
+        process.exit(0);
       }, 1000);
     } catch (error) {
       console.error('Error during restart:', error);
-      process.exit(1);
+      message.reply({ embeds: [new EmbedBuilder().setTitle('Error').setDescription(`Restart failed: ${error.message}`).setColor(ERROR_COLOR).setFooter({ text: FOOTER })] });
     }
   }
 }
