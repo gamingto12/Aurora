@@ -36,7 +36,7 @@ module.exports = {
         { name: 'Boost Tier', value: guild.premiumTier ? `Tier ${guild.premiumTier}` : 'None', inline: true },
         { name: 'Boost Count', value: String(guild.premiumSubscriptionCount || 0), inline: true },
         { name: 'Verification', value: String(guild.verificationLevel), inline: true },
-        { name: 'Invite', value: inviteLink, inline: false },
+        { name: 'Invite', value: `[Click here](${inviteLink})`, inline: false },
         { name: 'Created', value: guild.createdAt.toDateString(), inline: true }
       )
       .setFooter({ text: FOOTER })

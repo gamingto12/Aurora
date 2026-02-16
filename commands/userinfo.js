@@ -30,7 +30,6 @@ module.exports = {
         { name: 'ID', value: user.id, inline: true },
         { name: 'Bot', value: user.bot ? 'Yes' : 'No', inline: true },
         { name: 'Server Join Date', value: message.member ? message.member.joinedAt.toDateString() : 'Unknown', inline: true },
-        { name: 'Badges', value: badges, inline: true },
         { name: 'Created', value: user.createdAt.toDateString(), inline: true },
         { name: 'Avatar', value: `[Link](${user.displayAvatarURL({ dynamic: true, size: 1024 })})`, inline: true },
         { name: 'Profile', value: `[Discord Profile](https://discord.com/users/${user.id})`, inline: true },
