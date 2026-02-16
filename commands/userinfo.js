@@ -1,0 +1,43 @@
+const { EmbedBuilder } = require('discord.js');
+const { DEFAULT_COLOR, FOOTER } = require('../utils/theme');
+
+module.exports = {
+  name: 'userinfo',
+  description: 'Get information about yourself or another user',
+  usage: '[user]',
+  args: false,
+  execute(message, client, args) {
+    let user;
+
+    if (args.length > 0) {
+      const mention = message.mentions.users.first();
+      if (mention) {
+        user = mention;
+      } else {
+        user = client.users.cache.get(args[0]);
+      }
+    }
+
+    if (!user) user = message.author;
+
+    const badges = (user.flags && typeof user.flags.toArray === 'function') ? user.flags.toArray().join(', ') : 'None';
+
+    const embed = new EmbedBuilder()
+      .setTitle(`${user.tag}`)
+      .setThumbnail(user.displayAvatarURL({ dynamic: true }))
+      .setColor(DEFAULT_COLOR)
+      .addFields(
+        { name: 'ID', value: user.id, inline: true },
+        { name: 'Bot', value: user.bot ? 'Yes' : 'No', inline: true },
+        { name: 'Badges', value: badges || 'None', inline: true },
+        { name: 'Created', value: user.createdAt.toDateString(), inline: true },
+        { name: 'Avatar', value: `[Link](${user.displayAvatarURL({ dynamic: true, size: 1024 })})`, inline: true },
+        { name: 'Profile', value: `[Discord Profile](https://discord.com/users/${user.id})`, inline: true },
+        { name: 'Has Nitro', value: user.avatar && user.avatar.startsWith('a_') ? 'Yes' : 'No', inline: true },
+        { name: 'Activity', value: message.member?.presence?.activities?.[0]?.name || 'None', inline: true }
+      )
+      .setFooter({ text: FOOTER });
+
+    message.reply({ embeds: [embed] });
+  }
+};

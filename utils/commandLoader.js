@@ -12,5 +12,8 @@ module.exports = (client) => {
     commands.set(command.name, command);
   }
 
+  // Attach to client for backward compatibility
+  client.commands = commands;
+
   return commands;
 };
