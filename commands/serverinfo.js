@@ -29,7 +29,7 @@ module.exports = {
       .addFields(
         { name: 'Name', value: guild.name, inline: true },
         { name: 'ID', value: guild.id, inline: true },
-        { name: 'Owner ID', value: guild.ownerId || 'Unknown', inline: true },
+        { name: 'Server Owner', value: `<@${guild.ownerId}>`, inline: true },
         { name: 'Members', value: String(guild.memberCount), inline: true },
         { name: 'Channels', value: String(guild.channels.cache.size), inline: true },
         { name: 'Roles', value: String(guild.roles.cache.size), inline: true },

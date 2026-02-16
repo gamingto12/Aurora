@@ -29,11 +29,13 @@ module.exports = {
       .addFields(
         { name: 'ID', value: user.id, inline: true },
         { name: 'Bot', value: user.bot ? 'Yes' : 'No', inline: true },
-        { name: 'Badges', value: badges || 'None', inline: true },
+        { name: 'Server Join Date', value: message.member ? message.member.joinedAt.toDateString() : 'Unknown', inline: true },
+        { name: 'Badges', value: badges, inline: true },
         { name: 'Created', value: user.createdAt.toDateString(), inline: true },
         { name: 'Avatar', value: `[Link](${user.displayAvatarURL({ dynamic: true, size: 1024 })})`, inline: true },
         { name: 'Profile', value: `[Discord Profile](https://discord.com/users/${user.id})`, inline: true },
-        { name: 'Has Nitro', value: user.avatar && user.avatar.startsWith('a_') ? 'Yes' : 'No', inline: true },
+        { name: 'Nitro', value: user.premium ? 'Yes' : 'No', inline: true },
+        { name: 'Nickname', value: message.member?.nickname || 'None', inline: true },
         { name: 'Activity', value: message.member?.presence?.activities?.[0]?.name || 'None', inline: true }
       )
       .setFooter({ text: FOOTER });
