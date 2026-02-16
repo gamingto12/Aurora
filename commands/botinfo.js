@@ -21,7 +21,7 @@ module.exports = {
         { name: 'Invite', value: '[Click here](https://discord.com/oauth2/authorize?client_id=1042119280851963914&permissions=1374389659654&integration_type=0&scope=bot)', inline: false },
         { name: 'Repository', value: '[GitHub](https://github.com/0x7694C9/Aurora)', inline: false },
         { name: 'Support Server', value: '[Join here](https://discord.gg/eBV9RsC2BV)', inline: false },
-        { name: 'Lines of Code', value: getLinesofCode(), inline: true }
+        { name: 'Lines of Code', value: 'There\'s a few lines, maybe more', inline: true }
       )
       .setFooter({ text: `${FOOTER} • Created by 0x7694C9` })
       .setTimestamp();
