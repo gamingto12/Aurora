@@ -1,4 +1,4 @@
-const { EmbedBuilder, PermissionFlagsBits } = require('discord.js');
+const { EmbedBuilder, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
 const { ERROR_COLOR, FOOTER } = require('../utils/theme');
 
 module.exports = {
@@ -6,7 +6,56 @@ module.exports = {
   description: 'Kick a user from the server (admin only)',
   usage: '<user>',
   args: true,
-  async execute(message, client, args) {
+  data: new SlashCommandBuilder()
+    .setName('kick')
+    .setDescription('Kick a user from the server (admin only)')
+    .addUserOption((opt) => opt.setName('user').setDescription('User to kick').setRequired(true)),
+
+  async execute(context, client, args) {
+    const isInteraction = context?.isChatInputCommand && typeof context.isChatInputCommand === 'function' && context.isChatInputCommand();
+
+    if (isInteraction) {
+      const interaction = context;
+      if (!interaction.inGuild()) return interaction.reply({ content: 'This command can only be used in a server.', ephemeral: true });
+
+      if (!interaction.member.permissions.has(PermissionFlagsBits.KickMembers)) {
+        const embed = new EmbedBuilder().setTitle('Permission denied').setDescription('You do not have permission to use this command.').setColor(ERROR_COLOR).setFooter({ text: FOOTER });
+        return interaction.reply({ embeds: [embed], ephemeral: true });
+      }
+
+      const user = interaction.options.getUser('user');
+      if (!user) return interaction.reply({ content: 'Please provide a valid user to kick.', ephemeral: true });
+
+      const member = interaction.guild.members.cache.get(user.id);
+      if (!member) {
+        const embed = new EmbedBuilder().setTitle('Not in server').setDescription('That user is not in this server.').setColor(ERROR_COLOR).setFooter({ text: FOOTER });
+        return interaction.reply({ embeds: [embed], ephemeral: true });
+      }
+
+      if (!member.kickable) {
+        const embed = new EmbedBuilder().setTitle('Cannot kick').setDescription('I cannot kick that user.').setColor(ERROR_COLOR).setFooter({ text: FOOTER });
+        return interaction.reply({ embeds: [embed], ephemeral: true });
+      }
+
+      try {
+        await member.kick();
+        const embed = new EmbedBuilder()
+          .setTitle('User Kicked')
+          .setColor(ERROR_COLOR)
+          .setDescription(`${user.tag} was kicked`)
+          .setFooter({ text: `${FOOTER} • Kicked by ${interaction.user.tag}` })
+          .setTimestamp();
+
+        return interaction.reply({ embeds: [embed] });
+      } catch (error) {
+        console.error(error);
+        const embed = new EmbedBuilder().setTitle('Error').setDescription('There was an error trying to kick that user.').setColor(ERROR_COLOR).setFooter({ text: FOOTER });
+        return interaction.reply({ embeds: [embed], ephemeral: true });
+      }
+    }
+
+    // Message-based flow (original)
+    const message = context;
     if (!message.guild) {
       return message.reply({ embeds: [new EmbedBuilder().setTitle('Error').setDescription('This command can only be used in a server.').setColor(ERROR_COLOR).setFooter({ text: FOOTER })] });
     }
@@ -44,4 +93,4 @@ module.exports = {
       message.reply({ embeds: [new EmbedBuilder().setTitle('Error').setDescription('There was an error trying to kick that user.').setColor(ERROR_COLOR).setFooter({ text: FOOTER })] });
     }
   }
-}
+} 

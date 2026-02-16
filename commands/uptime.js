@@ -1,10 +1,14 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const { DEFAULT_COLOR, FOOTER } = require('../utils/theme');
 
 module.exports = {
   name: 'uptime',
   description: 'Shows how long the bot has been online (in a human-readable format)',
-  execute(message, client) {
+  data: new SlashCommandBuilder().setName('uptime').setDescription('Shows how long the bot has been online'),
+
+  async execute(context, client) {
+    const isInteraction = context?.isChatInputCommand && typeof context.isChatInputCommand === 'function' && context.isChatInputCommand();
+
     const uptime = client.uptime || 0;
     const days = Math.floor(uptime / (1000 * 60 * 60 * 24));
     const hours = Math.floor((uptime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -19,6 +23,12 @@ module.exports = {
       .setFooter({ text: FOOTER })
       .setTimestamp();
 
+    if (isInteraction) {
+      return context.reply({ embeds: [embed] });
+    }
+
+    // Message-based
+    const message = context;
     message.reply({ embeds: [embed] });
   }
-}
+} 

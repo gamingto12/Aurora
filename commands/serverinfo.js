@@ -1,15 +1,19 @@
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const { DEFAULT_COLOR, ERROR_COLOR, FOOTER } = require('../utils/theme');
 
 module.exports = {
   name: 'serverinfo',
   description: 'Get information about the server',
-  async execute(message) {
-    const { guild } = message;
+  data: new SlashCommandBuilder().setName('serverinfo').setDescription('Get information about the server'),
+
+  async execute(context) {
+    const isInteraction = context?.isChatInputCommand && typeof context.isChatInputCommand === 'function' && context.isChatInputCommand();
+    const guild = isInteraction ? context.guild : context.guild;
+
     if (!guild) {
       const err = new EmbedBuilder().setTitle('Error').setDescription('This command can only be used inside a server.').setColor(ERROR_COLOR).setFooter({ text: FOOTER });
-      message.reply({ embeds: [err] });
-      return;
+      if (isInteraction) return context.reply({ embeds: [err], ephemeral: true });
+      return context.reply({ embeds: [err] });
     }
 
     // Try to fetch invites (may fail if bot lacks MANAGE_GUILD)
@@ -42,6 +46,7 @@ module.exports = {
       .setFooter({ text: FOOTER })
       .setTimestamp();
 
-    message.reply({ embeds: [embed] });
+    if (isInteraction) return context.reply({ embeds: [embed] });
+    return context.reply({ embeds: [embed] });
   }
-};
+}; 

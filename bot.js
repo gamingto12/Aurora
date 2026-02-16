@@ -4,6 +4,7 @@ require('dotenv').config();
 const loadCommands = require('./utils/commandLoader');
 const readyEvent = require('./events/ready');
 const messageCreateEvent = require('./events/messageCreate');
+const interactionCreateEvent = require('./events/interactionCreate');
 
 const client = new Client({
   intents: [
@@ -19,6 +20,7 @@ const commands = loadCommands(client);
 // Load events
 readyEvent(client);
 messageCreateEvent(client, commands);
+interactionCreateEvent(client);
 
 // Login to Discord
 client.login(process.env.DISCORD_TOKEN);
