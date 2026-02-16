@@ -2,8 +2,8 @@ const { EmbedBuilder } = require('discord.js');
 const { DEFAULT_COLOR, ERROR_COLOR, FOOTER } = require('../utils/theme');
 
 module.exports = {
-  name: 'stop',
-  description: 'Shut down the bot (owner only)',
+  name: 'restart',
+  description: 'Restart the bot (owner only)',
   async execute(message, client) {
     const ownerId = process.env.OWNER_ID || '0x7694C9';
     if (message.author.id !== ownerId) {
@@ -12,21 +12,21 @@ module.exports = {
 
     try {
       const embed = new EmbedBuilder()
-        .setTitle('Shutting down...')
-        .setDescription('The bot is going offline now.')
+        .setTitle('Restarting...')
+        .setDescription('The bot is restarting now.')
         .setColor(DEFAULT_COLOR)
         .setFooter({ text: FOOTER });
       
       await message.reply({ embeds: [embed] });
       
-      // Give Discord a moment to process the message, then disconnect
+      // Give Discord a moment to process the message, then restart
       setTimeout(async () => {
-        console.log('Shutting down bot...');
+        console.log('Restarting bot...');
         await client.destroy();
-        process.exit(0);
+        process.exit(0); // Exit with code 0 signals PM2 to restart
       }, 1000);
     } catch (error) {
-      console.error('Error during shutdown:', error);
+      console.error('Error during restart:', error);
       process.exit(1);
     }
   }
