@@ -74,6 +74,7 @@ module.exports = {
 
         await interaction.reply({ embeds: [embed] });
         setTimeout(() => interaction.deleteReply().catch(() => {}), 5000);
+        return;
       } catch (error) {
         console.error(error);
         const embed = new EmbedBuilder().setTitle('Error').setDescription('There was an error trying to delete messages in this channel.').setColor(ERROR_COLOR).setFooter({ text: FOOTER });
