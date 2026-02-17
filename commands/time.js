@@ -1,4 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { DateTime } = require('luxon');
 const weatherClient = require('../utils/weatherClient');
 const { DEFAULT_COLOR, FOOTER } = require('../utils/theme');
 
@@ -30,13 +31,29 @@ module.exports = {
       const localTime = weatherClient.formatLocalTimeFromOffset(tzOffset);
       const offsetLabel = weatherClient.formatOffset(tzOffset);
 
+      // Show equivalent times in a few common timezones to help with conversions
+      const utcNow = DateTime.utc();
+      const zones = [
+        { label: 'UTC', zone: 'UTC' },
+        { label: 'New York', zone: 'America/New_York' },
+        { label: 'London', zone: 'Europe/London' },
+        { label: 'Mumbai', zone: 'Asia/Kolkata' },
+        { label: 'Tokyo', zone: 'Asia/Tokyo' },
+      ];
+
+      const equivalents = zones.map((z) => {
+        const t = utcNow.setZone(z.zone).toFormat('EEE, LLL dd yyyy • HH:mm');
+        return `**${z.label}**: ${t}`;
+      }).join('\n');
+
       const embed = new EmbedBuilder()
         .setTitle(`${data.name}${data.sys?.country ? `, ${data.sys.country}` : ''} — Local Time`)
         .setColor(DEFAULT_COLOR)
         .addFields(
           { name: 'Local time', value: `**${localTime}**`, inline: true },
           { name: 'Timezone', value: `${offsetLabel}`, inline: true },
-          { name: 'Coordinates', value: `${data.coord.lat.toFixed(4)}, ${data.coord.lon.toFixed(4)}`, inline: true }
+          { name: 'Coordinates', value: `${data.coord.lat.toFixed(4)}, ${data.coord.lon.toFixed(4)}`, inline: true },
+          { name: 'Equivalent times', value: equivalents, inline: false }
         )
         .setFooter({ text: FOOTER })
         .setTimestamp();

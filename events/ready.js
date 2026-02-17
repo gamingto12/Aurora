@@ -18,10 +18,18 @@ module.exports = (client) => {
         // For development fast-iteration, register to a single guild using process.env.GUILD_ID
         if (process.env.GUILD_ID) {
           await rest.put(Routes.applicationGuildCommands(client.user.id, process.env.GUILD_ID), { body: commandsPayload });
-          console.log(`🔁 Registered ${commandsPayload.length} slash command(s) to guild ${process.env.GUILD_ID}`);
+          console.log(`Registered ${commandsPayload.length} slash command(s) to guild ${process.env.GUILD_ID}`);
+
+          // If running in guild mode, remove any global commands to avoid duplicate entries
+          try {
+            await rest.put(Routes.applicationCommands(client.user.id), { body: [] });
+            console.log('Cleared global application commands to avoid duplicates (running in guild mode)');
+          } catch (e) {
+            console.warn('Could not clear global application commands:', e?.message || e);
+          }
         } else {
           await rest.put(Routes.applicationCommands(client.user.id), { body: commandsPayload });
-          console.log(`🔁 Registered ${commandsPayload.length} global slash command(s)`);
+          console.log(`Registered ${commandsPayload.length} global slash command(s)`);
         }
       }
     } catch (err) {

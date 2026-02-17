@@ -5,6 +5,13 @@ const API_KEY = process.env.OPENWEATHER_KEY;
 const CACHE_TTL = 60 * 1000; // 60 seconds
 const cache = new Map();
 
+// Runtime sanity check (do not log the key itself)
+if (!API_KEY) {
+  console.warn('OPENWEATHER_KEY not set in environment — /weather and /time will fail.');
+} else {
+  console.debug('OPENWEATHER_KEY is present');
+}
+
 function cToF(c) {
   return (c * 9) / 5 + 32;
 }
@@ -40,8 +47,21 @@ async function fetchWeather(query, units = 'imperial') {
     url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(query)}&appid=${API_KEY}&units=${units}`;
   }
 
-  const res = await axios.get(url, { timeout: 7000 });
-  return res.data;
+  try {
+    const res = await axios.get(url, { timeout: 7000 });
+    return res.data;
+  } catch (err) {
+    if (err.response) {
+      const status = err.response.status;
+      const statusText = err.response.statusText || '';
+      const details = err.response.data || {};
+      const e = new Error(`OpenWeather API error: ${status} ${statusText}`);
+      e.code = status;
+      e.details = details;
+      throw e;
+    }
+    throw err;
+  }
 }
 
 async function getWeather(location, units = 'imperial') {
