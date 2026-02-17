@@ -34,6 +34,7 @@ module.exports = {
           let remaining = count;
           let lastId = undefined;
           let totalDeleted = 0;
+          let foundOlder = false;
           const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000; // 14 days in ms
 
           while (remaining > 0) {
@@ -46,6 +47,9 @@ module.exports = {
 
             // Keep track of oldest message fetched for the next 'before' cursor
             lastId = fetched.last().id;
+
+            // Mark if any fetched messages are older than cutoff
+            if (fetched.some && fetched.some(m => m.createdTimestamp <= cutoff)) foundOlder = true;
 
             // Only messages newer than 14 days can be bulk-deleted
             const deletable = fetched.filter(m => m.createdTimestamp > cutoff);
@@ -62,13 +66,13 @@ module.exports = {
             if (fetched.size < fetchLimit) break;
           }
 
-          return { totalDeleted, remaining };
+          return { totalDeleted, remaining, foundOlder };
         })(interaction.channel, deleteCount);
 
         const embed = new EmbedBuilder()
           .setTitle('Purge Complete')
           .setColor(ERROR_COLOR)
-          .setDescription(`Requested ${deleteCount} — deleted ${purgeResult.totalDeleted} message(s).${purgeResult.remaining > 0 ? ' Some messages may be older than 14 days and could not be bulk-deleted.' : ''}`)
+          .setDescription(`Requested ${deleteCount} — deleted ${purgeResult.totalDeleted} message(s).${purgeResult.foundOlder ? ' Some messages may be older than 14 days and could not be bulk-deleted.' : ''}`)
           .setFooter({ text: FOOTER })
           .setTimestamp();
 
@@ -103,6 +107,7 @@ module.exports = {
         let remaining = count;
         let lastId = undefined;
         let totalDeleted = 0;
+        let foundOlder = false;
         const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000; // 14 days in ms
 
         while (remaining > 0) {
@@ -114,6 +119,7 @@ module.exports = {
           if (!fetched.size) break;
 
           lastId = fetched.last().id;
+          if (fetched.some && fetched.some(m => m.createdTimestamp <= cutoff)) foundOlder = true;
           const deletable = fetched.filter(m => m.createdTimestamp > cutoff);
           if (deletable.size > 0) {
             const deleted = await channel.bulkDelete(deletable, true);
@@ -125,13 +131,13 @@ module.exports = {
           if (fetched.size < fetchLimit) break;
         }
 
-        return { totalDeleted, remaining };
+        return { totalDeleted, remaining, foundOlder };
       })(message.channel, deleteCount);
 
       const embed = new EmbedBuilder()
         .setTitle('Purge Complete')
         .setColor(ERROR_COLOR)
-        .setDescription(`Requested ${deleteCount} — deleted ${purgeResult.totalDeleted} message(s).${purgeResult.remaining > 0 ? ' Some messages may be older than 14 days and could not be bulk-deleted.' : ''}`)
+        .setDescription(`Requested ${deleteCount} — deleted ${purgeResult.totalDeleted} message(s).${purgeResult.foundOlder ? ' Some messages may be older than 14 days and could not be bulk-deleted.' : ''}`)
         .setFooter({ text: FOOTER })
         .setTimestamp();
 
